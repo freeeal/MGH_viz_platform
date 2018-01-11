@@ -19,7 +19,7 @@ def home():
     panas_dict = {}
 
     for filename in filenames:
-        df = pd.read_csv(filename)
+        df = pd.read_csv('data/' + filename)
         # print(df.columns.values)
         column_names = list(df.columns.values)
         column_quant_names = column_names[12:32] # numerical column names
@@ -73,7 +73,7 @@ def home():
     print(panas_dict)
 
     # Parse Clinical Scales data
-    clinical_df = pd.read_csv('Clinical-Scales-Demo.csv')
+    clinical_df = pd.read_csv('data/Clinical-Scales-Demo.csv')
     # print(clinical_df)
     # columns = list(clinical_df.columns.values)
     clinical_dict = {}
