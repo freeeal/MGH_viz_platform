@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Patient
+    </button>
+    <div id="patient" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item active" onclick="selectPatient(this, 1)">1</a>
+      <a class="dropdown-item" onclick="selectPatient(this, 2)">2</a>
+      <a class="dropdown-item" onclick="selectPatient(this, 3)">3</a>
+      <a class="dropdown-item" onclick="selectPatient(this, 4)">4</a>
+      <a class="dropdown-item" onclick="selectPatient(this, 5)">5</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      PANAS Dataset
+    </button>
+    <div id="panas" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item active" onclick="selectPANAS(this, 'pos')">PA</a>
+      <a class="dropdown-item" onclick="selectPANAS(this, 'neg')">NA</a>
+      <a class="dropdown-item" onclick="selectPANAS(this, 'div')">PA/NA</a>
+      <a class="dropdown-item" onclick="selectPANAS(this, 'log')">log(PA/NA)</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Clinical Dataset
+    </button>
+    <div id="clinical" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item active" onclick="selectClinical(this, 'HAM-D-17')">HAM-D-17</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-D-28')">HAM-D-28</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-A')">HAM-A</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'PSS')">PSS</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'ERS')">ERS</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">RRS</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Aggregation
+    </button>
+    <div id="aggregation" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item active" href="#" onclick="updateAggregation(this, 'mean')">Mean</a>
+      <a class="dropdown-item" href="#" onclick="updateAggregation(this, 'median')">Median</a>
+      <a class="dropdown-item" href="#" onclick="updateAggregation(this, 'max')">Max</a>
+      <a class="dropdown-item" href="#" onclick="updateAggregation(this, 'min')">Min</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      # of Days
+    </button>
+    <div id="days" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item active" href="#" onclick="updateNumDays(this, 1)">1</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 2)">2</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 3)">3</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 4)">4</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 5)">5</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 6)">6</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 7)">7</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 8)">8</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 9)">9</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 10)">10</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 11)">11</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 12)">12</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 13)">13</a>
+      <a class="dropdown-item" href="#" onclick="updateNumDays(this, 14)">14</a>
+    </div>
+  </div>
+</div>
+<div id="timeSeries"><!-- Plotly chart will be drawn inside this DIV --></div>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+  // first index is selected PANAS data object
+  // second index is selected Clinical data object
+  // object form:
+  // {
+  //   'dataset_name': {
+  //     'date': [],
+  //     'score': []
+  //   }
+  // }
+
+  // DEFAULT VALUES ===========================================================
+  let patientNumber = 1;
+  let panasDataset = 'pos';
+  let clinicalDataset = 'HAM-D-17';
+  let aggregationType = 'mean';
+  let numDays = 1;
+
+  // GENERIC ARRAY AGGREGATION FUNCTIONS ======================================
+  let mean = (arr) => {
+    let sum = arr.reduce((a,b) => a+b);
+    return sum / arr.length;
+  };
+
+  let median = (arr) => {
+    let sortedArr = arr.sort((a,b) => a-b);
+    let lowMid = Math.floor((sortedArr.length - 1) / 2);
+    let highMid = Math.ceil((sortedArr.length - 1) / 2);
+    return (sortedArr[lowMid] + sortedArr[highMid]) / 2;
+  };
+
+  let max = (arr) => {
+    return arr.reduce((a,b) => Math.max(a,b));
+  }
+
+  let min = (arr) => {
+    return arr.reduce((a,b) => Math.min(a,b));
+  }
+
+  // UTILITY FUNCTIONS ========================================================
+  function changeMenuSelection(thisEl, menuId) {
+    let dropdownItems = document.getElementById(menuId).childNodes;
+
+    for (let item of dropdownItems) {
+      if (item.nodeType != Node.TEXT_NODE) {
+        if (item.getAttribute("class") === "dropdown-item active") {
+          item.setAttribute("class", "dropdown-item");
+        }
+      }
+    }
+
+    thisEl.setAttribute("class", "dropdown-item active");
+  }
+
+  function panasToDate(d) {
+    return new Date(d);
+  }
+
+  function panasToScore(score_arr) {
+    const reducer = (accumulator, currentValue) => accumulator + currentValue
+    return score_arr.reduce(reducer)
+  }
+
+  // MAIN AGGREGATION FUNCTION FOR PANAS DATA =================================
+  function aggregatePANAS() {
+    console.log(data);
+
+    let panasDisplayArr = {
+      'date': [],
+      'score': []
+    }
+
+    let clinicalDisplayArr = {
+      'date': [],
+      'score': []
+    }
+
+    panasDateArr = data[0].x;
+    panasScoreArr = data[0].y;
+    clinicalDateArr = data[1].x;
+    clinicalScoreArr = data[1].y;
+    clinicalScaleName = data[1].name;
+
+    let k = 0;
+
+    for (let i = 0; i < clinicalDateArr.length; i++) {
+      // current aggregated panas score array
+      let thisScoreAggregationArrPANAS = [];
+
+      for (let j = k; j < panasDateArr.length; j++) {
+        // if within time interval range
+        if (panasDateArr[j].getTime() <= clinicalDateArr[i].getTime() && panasDateArr[j].getTime() > clinicalDateArr[i].getTime() - (numDays * 24 * 60 * 60 * 1000)) {
+          thisScoreAggregationArrPANAS.push(panasScoreArr[j]);
+        } else {
+          if (thisScoreAggregationArrPANAS.length != 0) {
+            panasDisplayArr.date.push(clinicalDateArr[i]);
+            clinicalDisplayArr.date.push(clinicalDateArr[i]);
+            clinicalDisplayArr.score.push(clinicalScoreArr[i]);
+
+            if (aggregationType == 'mean') {
+              panasDisplayArr.score.push(mean(thisScoreAggregationArrPANAS));
+            }
+            if (aggregationType == 'median') {
+              panasDisplayArr.score.push(median(thisScoreAggregationArrPANAS));
+            }
+            if (aggregationType == 'max') {
+              panasDisplayArr.score.push(max(thisScoreAggregationArrPANAS));
+            }
+            if (aggregationType == 'min') {
+              panasDisplayArr.score.push(min(thisScoreAggregationArrPANAS));
+            }
+
+            k = j - 1; // retain index in panasDateArr for next clinical date
+            thisScoreAggregationArrPANAS = []
+            break;
+          }
+        }
+      }
+    }
+
+    let panasDisplayObj = {
+      x: panasDisplayArr['date'].map(panasToDate),
+      y: panasDisplayArr['score'],
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: PANAS_names[patientNumber - 1],
+      line: {
+        dash: 'solid',
+        width: 1
+      }
+    };
+    let clinicalDisplayObj = {
+      x: clinicalDisplayArr['date'],
+      y: clinicalDisplayArr['score'],
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: clinicalScaleName,
+      line: {
+        dash: 'solid',
+        width: 1
+      }
+    };
+    displayData = [panasDisplayObj, clinicalDisplayObj];
+
+    Plotly.newPlot('timeSeries', displayData, layout);
+  }
+
+  // MENU SELECTION FUNCTIONS =================================================
+  function selectPatient(thisEl, patientNum) {
+    changeMenuSelection(thisEl, "patient");
+    patientNumber = patientNum;
+
+    let newPANASObj = {
+      x: panas_data[PANAS_names[patientNum - 1]]['date'].map(panasToDate),
+      y: panas_data[PANAS_names[patientNum - 1]]['positive_scores'].map(panasToScore),
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: PANAS_names[patientNum - 1],
+      line: {
+        dash: 'solid',
+        width: 1
+      }
+    };
+
+    let newClinicalObj = {
+      x: clinical_data['P' + patientNum][clinicalDataset]['date'].map(clinicalToDate),
+      y: clinical_data['P' + patientNum][clinicalDataset]['score'],
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: clinicalDataset,
+      yaxis: 'y2',
+      line: {
+        dash: 'dot',
+        width: 1
+      }
+    }
+
+    data = [newPANASObj, newClinicalObj];
+    // aggregatePANAS();
+    Plotly.newPlot('timeSeries', data, layout);
+  }
+
+  function selectPANAS(thisEl, affectType) {
+    changeMenuSelection(thisEl, "panas");
+    panasDataset = affectType;
+
+    let thisPANASTrace = {
+      x: panas_data[PANAS_names[patientNumber - 1]]['date'].map(panasToDate),
+      mode: 'lines',
+      name: PANAS_names[patientNumber - 1],
+      line: {
+        dash: 'solid',
+        width: 1
+      }
+    };
+
+    if (panasDataset == 'pos') {
+      thisPANASTrace.y = panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(panasToScore);
+    }
+    if (panasDataset == 'neg') {
+      thisPANASTrace.y = panas_data[PANAS_names[patientNumber - 1]]['negative_scores'].map(panasToScore);
+    }
+    if (panasDataset == 'div' || panasDataset == 'log') {
+      thisPANASTrace.y = [];
+      for (i = 0; i < panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(panasToScore).length; i++) {
+        let pos = panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(panasToScore)[i];
+        let neg = panas_data[PANAS_names[patientNumber - 1]]['negative_scores'].map(panasToScore)[i];
+        if (panasDataset == 'div') {
+          thisPANASTrace.y.push(pos/neg);
+        } else {
+          thisPANASTrace.y.push(Math.log(pos/neg));
+        }
+      }
+    }
+
+    data[0] = thisPANASTrace;
+    console.log(data);
+    aggregatePANAS();
+  }
+
+  function clinicalToDate(d) {
+  	let parts = d.split('/');
+
+    return new Date('20' + parts[2], parts[0], parts[1]);
+  }
+
+  // function to modify selected clinical dataset
+  function selectClinical(thisEl, scale) {
+    changeMenuSelection(thisEl, "clinical");
+    console.log('selected scale: ', scale);
+    clinicalDataset = scale;
+
+    clinicalObj.x = clinical_data['P1'][scale]['date'].map(clinicalToDate);
+    clinicalObj.y = clinical_data['P1'][scale]['score'];
+    clinicalObj.name = scale;
+
+    data[1] = clinicalObj;
+    console.log(data);
+    // Plotly.newPlot('timeSeries', data, layout);
+    aggregatePANAS();
+  }
+
+  // default = 1
+  function updateNumDays(thisEl, days) {
+    changeMenuSelection(thisEl, "days");
+    console.log('selected num days: ', days);
+
+    numDays = days;
+    aggregatePANAS();
+  }
+
+  // default = none -- any
+  function updateAggregation(thisEl, type) {
+    changeMenuSelection(thisEl, "aggregation");
+    console.log('selected agg type: ', type);
+
+    aggregationType = type;
+    aggregatePANAS();
+  }
+
+  // DEFAULT BEHAVIOR (get data, set initial states) ==========================
+  let panas_data = JSON.parse({{ panas_data|tojson|safe }});
+  console.log(panas_data);
+  let PANAS_names = Object.keys(panas_data);
+  console.log(PANAS_names);
+
+  let clinical_data = JSON.parse({{ clinical_data|tojson|safe }});
+  console.log(clinical_data);
+  let clinical_names = [];
+  for (const key in clinical_data) {
+    for (const scale_name in clinical_data[key]) {
+      clinical_names.push(key + '-' + scale_name);
+    }
+  }
+  console.log(clinical_names);
+
+  // default panas: positive affect
+  let panasObj = {
+    x: panas_data[PANAS_names[0]]['date'].map(panasToDate),
+    y: panas_data[PANAS_names[0]]['positive_scores'].map(panasToScore),
+    mode: 'lines+markers',
+    type: 'scatter',
+    name: PANAS_names[0],
+    line: {
+      dash: 'solid',
+      width: 1
+    }
+  };
+
+  // default clinical: HAM-D-17
+  let clinicalObj = {
+    x: clinical_data['P1']['HAM-D-17']['date'].map(clinicalToDate),
+    y: clinical_data['P1']['HAM-D-17']['score'],
+    mode: 'lines+markers',
+    type: 'scatter',
+    name: 'HAM-D-17',
+    yaxis: 'y2',
+    line: {
+      dash: 'dot',
+      width: 1
+    }
+  }
+
+  // selected datasets
+  let data = [panasObj, clinicalObj];
+
+  let layout = {
+    title:'Time Series of PANAS & Clinical Scale',
+    xaxis: {
+      title: 'Date'
+    },
+    yaxis: {
+      title: 'PANAS Score'
+    },
+    yaxis2: {
+      title: 'Clinical Scale Score',
+      titlefont: {color: 'rgb(148, 103, 189)'},
+      tickfont: {color: 'rgb(148, 103, 189)'},
+      overlaying: 'y',
+      side: 'right'
+    },
+    width: 1200,
+    height: 600,
+    legend: {
+      x: 100,
+      y: 1,
+      traceorder: 'reversed',
+      font: {
+        size: 16
+      },
+      yref: 'paper'
+    }
+  };
+
+  Plotly.newPlot('timeSeries', data, layout);
+</script>
+
+{% endblock %}
