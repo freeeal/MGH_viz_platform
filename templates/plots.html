@@ -4,7 +4,7 @@
 
 <div class="row">
   <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-primary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Patient
     </button>
     <div id="patient" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -16,7 +16,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       PANAS Dataset
     </button>
     <div id="panas" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -27,11 +27,11 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Clinical Dataset
     </button>
     <div id="clinical" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item active" onclick="selectClinical(this, 'HAM-D-17')">HAM-D-17</a>
+      <a class="dropdown-item active" onclick="selectClinical(this, 'HAM-D-17')">HAM-D-17<span class="caret"></span></a>
       <a class="dropdown-item" onclick="selectClinical(this, 'HAM-D-28')">HAM-D-28</a>
       <a class="dropdown-item" onclick="selectClinical(this, 'HAM-A')">HAM-A</a>
       <a class="dropdown-item" onclick="selectClinical(this, 'PSS')">PSS</a>
@@ -40,7 +40,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Aggregation
     </button>
     <div id="aggregation" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -51,7 +51,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       # of Days
     </button>
     <div id="days" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -212,6 +212,7 @@
       mode: 'lines+markers',
       type: 'scatter',
       name: clinicalScaleName,
+      yaxis: 'y2',
       line: {
         dash: 'solid',
         width: 1
@@ -384,28 +385,40 @@
   let layout = {
     title:'Time Series of PANAS & Clinical Scale',
     xaxis: {
-      title: 'Date'
+      title: 'Date',
+      titlefont: {size: 16},
+      tickfont: {size: 14},
     },
     yaxis: {
-      title: 'PANAS Score'
+      title: 'PANAS Score',
+      titlefont: {color: 'rgb(148, 103, 189)', size: 16},
+      tickfont: {color: 'rgb(148, 103, 189)', size: 14},
     },
     yaxis2: {
       title: 'Clinical Scale Score',
-      titlefont: {color: 'rgb(148, 103, 189)'},
-      tickfont: {color: 'rgb(148, 103, 189)'},
+      titlefont: {color: 'rgb(148, 103, 189)', size: 16},
+      tickfont: {color: 'rgb(148, 103, 189)', size: 14},
       overlaying: 'y',
-      side: 'right'
+      side: 'right',
     },
     width: 1200,
     height: 600,
     legend: {
-      x: 100,
-      y: 1,
-      traceorder: 'reversed',
+      x: 0.9,
+      y: -0.25,
+      traceorder: 'normal',
+      // orientation: 'h',
       font: {
-        size: 16
+        size: 14
       },
-      yref: 'paper'
+      // bgcolor: '#E2E2E2',
+      // bordercolor: '#FFFFFF',
+      // borderwidth: 2
+    },
+
+    font: {
+      family: "'Roboto', sans-serif",
+      size: 16
     }
   };
 
