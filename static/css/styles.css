@@ -1,63 +1,55 @@
 body {
   margin: 0px;
   font-family: 'Roboto', sans-serif;
+  /* color: #332A4D; */
+  /* background-color: #F1F2F0; */
 }
 
 .row {
-  margin-top: 10px;
-  padding-left: 10px;
+  padding: 5px;
+  background-color: #d3d3d3;
+  border-bottom: 1px solid #a9a9a9;
+  margin-bottom: 10px;
 }
 
 .dropdown {
   padding: 5px;
 }
 
-/* https://bootsnipp.com/snippets/featured/multi-level-dropdown-menu-bs3 */
-
-.dropdown-submenu {
-    position: relative;
-}
-
-.dropdown-submenu>.dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-top: -6px;
-    margin-left: -1px;
-    -webkit-border-radius: 0 6px 6px 6px;
-    -moz-border-radius: 0 6px 6px;
-    border-radius: 0 6px 6px 6px;
-}
-
-.dropdown-submenu:hover>.dropdown-menu {
-    display: block;
-}
-
-.dropdown-submenu>a:after {
-    display: block;
-    content: " ";
+/* .active-tick a:after {
+    content: '\f00c';
+    font-family: 'FontAwesome';
     float: right;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid;
-    border-width: 5px 0 5px 5px;
-    border-left-color: #ccc;
-    margin-top: 5px;
-    margin-right: -10px;
+} */
+
+.fa-check {
+  padding-left: 15px;
+  float: right;
+  vertical-align: middle;
 }
 
-.dropdown-submenu:hover>a:after {
-    border-left-color: #fff;
+/* .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background-color: #332A4D !important;
+    color: #F1F2F0;
+    border: 0;
+} */
+
+.btn-success, .btn-success:hover, .btn-success:active, .btn-success:visited {
+  background-color: #FFA500 !important;
+  border-color: #FFA500 !important;
+  border: 1px solid transparent;
 }
 
-.dropdown-submenu.pull-left {
-    float: none;
+.btn-success:focus {
+    box-shadow: 0 0 0 0.2rem rgb(255,140,0);
 }
 
-.dropdown-submenu.pull-left>.dropdown-menu {
-    left: -100%;
-    margin-left: 10px;
-    -webkit-border-radius: 6px 0 6px 6px;
-    -moz-border-radius: 6px 0 6px 6px;
-    border-radius: 6px 0 6px 6px;
+.show>.btn-success.dropdown-toggle {
+  background-color: #FFA500 !important;
+  border-color: #FFA500 !important;
+  box-shadow: 0 0 0 0.2rem rgb(255,140,0);
 }
+
+/* .btn-success:active, .btn-success:visited {
+  box-shadow: 0 0 0 0.2rem #FF8C00;
+} */
