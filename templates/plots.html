@@ -39,19 +39,6 @@
       <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">RRS</a>
     </div>
   </div>
-  <!-- <div class="dropdown">
-    <button class="btn btn-dark btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Selected Clinical Questions
-    </button>
-    <div id="clinical-questions" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">Depressed mood<i class="fa fa-check" aria-hidden="true"></i></a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-D-28')">Feelings of guilt</a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-A')">Suicide <i class="fa fa-check" aria-hidden="true"></i></a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'PSS')">Insomnia early<i class="fa fa-check" aria-hidden="true"></i></a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'ERS')">Insomnia middle</a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">Insomnia late</a>
-    </div>
-  </div> -->
   <div class="dropdown">
     <button class="btn btn-dark btn-lg dropdown-toggle disabled" type="button" id="aggregationDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Aggregation
@@ -85,6 +72,19 @@
       <a class="dropdown-item" href="#" onclick="updateNumDays(this, 14)">14</a>
     </div>
   </div>
+  <!-- <div class="dropdown">
+    <button class="btn btn-dark btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Selected Clinical Questions
+    </button>
+    <div id="clinical-questions" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">Depressed mood<i class="fa fa-check" aria-hidden="true"></i></a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-D-28')">Feelings of guilt</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-A')">Suicide <i class="fa fa-check" aria-hidden="true"></i></a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'PSS')">Insomnia early<i class="fa fa-check" aria-hidden="true"></i></a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'ERS')">Insomnia middle</a>
+      <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">Insomnia late</a>
+    </div>
+  </div> -->
 </div>
 <div id="timeSeries"><!-- Plotly chart will be drawn inside this DIV --></div>
 <!-- Plotly.js -->
@@ -177,14 +177,14 @@
 
   // Function to reset everything to default
   function resetToDefaults() {
-    panasButtonDiv.innerHTML = "PANAS Dataset [PA]";
-    clinicalButtonDiv.innerHTML = "Clinical Dataset [" + clinicalDataset + "]";
-    aggregationButtonDiv.innerHTML = 'Aggregation [None]';
-    numDaysButtonDiv.innerHTML = '# of Days [N/A]';
     panasDataset = 'pos';
     clinicalDataset = 'HAM-D-17';
     aggregationType = 'none';
     numDays = 0;
+    panasButtonDiv.innerHTML = "PANAS Dataset [PA]";
+    clinicalButtonDiv.innerHTML = "Clinical Dataset [" + clinicalDataset + "]";
+    aggregationButtonDiv.innerHTML = 'Aggregation [None]';
+    numDaysButtonDiv.innerHTML = '# of Days [N/A]';
   }
 
   // MAIN AGGREGATION FUNCTION FOR PANAS DATA =================================
@@ -307,7 +307,7 @@
       name: clinicalDataset,
       yaxis: 'y2',
       line: {
-        dash: 'dot',
+        dash: 'solid',
         color: '#dc3545',
         width: 1
       }
@@ -433,6 +433,7 @@
       }
     } else {
       disableNumDaysButton();
+      numDays = 0; // reset numDays to 0 when aggregation is reset to 'none'
       numDaysButtonDiv.innerHTML = "# of Days [N/A]";
       Plotly.newPlot('timeSeries', data, layout);
     }
