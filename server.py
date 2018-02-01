@@ -20,12 +20,11 @@ def home():
 
     for filename in filenames:
         df = pd.read_csv('data/' + filename)
-        # print(df.columns.values)
+
         column_names = list(df.columns.values)
         column_quant_names = column_names[12:32] # numerical column names
 
         x_arr = []
-        # y_arr = []
         pos_arr = []
         neg_arr = []
 
@@ -37,7 +36,6 @@ def home():
                 # print(type(row[column_names[2]]))
                 row.fillna(0, inplace=True)
                 x_arr.append(row[column_names[8]] + " " + row[column_names[9]])
-                # y_arr.append(row[column_quant_names].sum(axis=0))
                 pos_arr.append([
                     row[column_names[12]],
                     row[column_names[14]],
@@ -70,11 +68,10 @@ def home():
             'negative_scores': neg_arr,
         }
 
-    print(panas_dict)
+    # print(panas_dict)
 
     # Parse Clinical Scales data
     clinical_df = pd.read_csv('data/Clinical-Scales-Demo.csv')
-    # print(clinical_df)
     # columns = list(clinical_df.columns.values)
     clinical_dict = {}
 
@@ -83,43 +80,51 @@ def home():
             clinical_dict[row['Record ID']] = {
                 'HAM-D-17': {
                     'date': [],
-                    'score': []
+                    'scores': []
                 },
                 'HAM-D-28': {
                     'date': [],
-                    'score': []
+                    'scores': []
                 },
                 'HAM-A': {
                     'date': [],
-                    'score': []
+                    'scores': []
                 },
                 'PSS': {
                     'date': [],
-                    'score': []
+                    'scores': []
                 },
                 'ERS': {
                     'date': [],
-                    'score': []
+                    'scores': []
                 },
                 'RRS': {
                     'date': [],
-                    'score': []
+                    'scores': []
                 },
             }
-        clinical_dict[row['Record ID']]['HAM-D-17']['date'].append(row['Date of Record'])
-        clinical_dict[row['Record ID']]['HAM-D-17']['score'].append(row['Total HAM-D-17 SCORE'])
-        clinical_dict[row['Record ID']]['HAM-D-28']['date'].append(row['Date of Record'])
-        clinical_dict[row['Record ID']]['HAM-D-28']['score'].append(row['HAM-D-28 Total'])
-        clinical_dict[row['Record ID']]['HAM-A']['date'].append(row['Date of Record'])
-        clinical_dict[row['Record ID']]['HAM-A']['score'].append(row['HAM-A Total Score'])
-        clinical_dict[row['Record ID']]['PSS']['date'].append(row['Date of Record'])
-        clinical_dict[row['Record ID']]['PSS']['score'].append(row['PSS Total Score'])
-        clinical_dict[row['Record ID']]['ERS']['date'].append(row['Date of Record'])
-        clinical_dict[row['Record ID']]['ERS']['score'].append(row['Total ERS Score'])
-        clinical_dict[row['Record ID']]['RRS']['date'].append(row['Date of Record'])
-        clinical_dict[row['Record ID']]['RRS']['score'].append(row['Total RRS Score'])
 
-    # print(clinical_dict)
+        ham_d_17_scores = [ int(row[i][0]) for i in range(3,20) ]
+        ham_d_28_scores = ham_d_17_scores + [ int(row[i][0]) for i in range(22,33) ]
+        ham_a_scores = [ int(row[i][0]) for i in range(35,49) ]
+        pss_scores = [ int(row[i][0]) for i in range(55,65) ]
+        ers_scores = [ int(row[i][0]) for i in range(66,87) ]
+        rrs_scores = [ int(row[i][0]) for i in range(89,111) ]
+
+        clinical_dict[row['Record ID']]['HAM-D-17']['date'].append(row['Date of Record'])
+        clinical_dict[row['Record ID']]['HAM-D-17']['scores'].append(ham_d_17_scores)
+        clinical_dict[row['Record ID']]['HAM-D-28']['date'].append(row['Date of Record'])
+        clinical_dict[row['Record ID']]['HAM-D-28']['scores'].append(ham_d_28_scores)
+        clinical_dict[row['Record ID']]['HAM-A']['date'].append(row['Date of Record'])
+        clinical_dict[row['Record ID']]['HAM-A']['scores'].append(ham_a_scores)
+        clinical_dict[row['Record ID']]['PSS']['date'].append(row['Date of Record'])
+        clinical_dict[row['Record ID']]['PSS']['scores'].append(pss_scores)
+        clinical_dict[row['Record ID']]['ERS']['date'].append(row['Date of Record'])
+        clinical_dict[row['Record ID']]['ERS']['scores'].append(ers_scores)
+        clinical_dict[row['Record ID']]['RRS']['date'].append(row['Date of Record'])
+        clinical_dict[row['Record ID']]['RRS']['scores'].append(rrs_scores)
+
+        print(clinical_dict)
 
     return render_template("plots.html",
                             panas_data=json.dumps(panas_dict),
