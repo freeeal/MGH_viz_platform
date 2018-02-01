@@ -9,18 +9,12 @@ body {
   padding: 5px;
   background-color: #d3d3d3;
   border-bottom: 1px solid #a9a9a9;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 
 .dropdown {
   padding: 5px;
 }
-
-/* .active-tick a:after {
-    content: '\f00c';
-    font-family: 'FontAwesome';
-    float: right;
-} */
 
 .fa-check {
   padding-left: 15px;
@@ -28,28 +22,7 @@ body {
   vertical-align: middle;
 }
 
-/* .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
-    background-color: #332A4D !important;
-    color: #F1F2F0;
-    border: 0;
-} */
-
-.btn-success, .btn-success:hover, .btn-success:active, .btn-success:visited {
-  background-color: #FFA500 !important;
-  border-color: #FFA500 !important;
-  border: 1px solid transparent;
-}
-
-.btn-success:focus {
-    box-shadow: 0 0 0 0.2rem rgb(255,140,0);
-}
-
-.show>.btn-success.dropdown-toggle {
-  background-color: #FFA500 !important;
-  border-color: #FFA500 !important;
-  box-shadow: 0 0 0 0.2rem rgb(255,140,0);
-}
-
-/* .btn-success:active, .btn-success:visited {
-  box-shadow: 0 0 0 0.2rem #FF8C00;
+/* #selectedClinicalQuestionsButton {
+  float: right;
+  vertical-align: middle;
 } */

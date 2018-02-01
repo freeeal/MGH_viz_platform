@@ -73,10 +73,10 @@
     </div>
   </div>
   <!-- <div class="dropdown">
-    <button class="btn btn-dark btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Selected Clinical Questions
     </button>
-    <div id="clinical-questions" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <div id="selected-clinical-questions" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">Depressed mood<i class="fa fa-check" aria-hidden="true"></i></a>
       <a class="dropdown-item" onclick="selectClinical(this, 'HAM-D-28')">Feelings of guilt</a>
       <a class="dropdown-item" onclick="selectClinical(this, 'HAM-A')">Suicide <i class="fa fa-check" aria-hidden="true"></i></a>
@@ -85,7 +85,41 @@
       <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">Insomnia late</a>
     </div>
   </div> -->
+
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#selectedClinicalQuestionsModal">
+    Launch demo modal
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="selectedClinicalQuestionsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Selected Clinical Questions</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div>
+            <input type="checkbox" id="coding" name="interest" value="coding" checked>
+            <label for="coding">Coding</label>
+          </div>
+          <div>
+            <input type="checkbox" id="music" name="interest" value="music">
+            <label for="music">Music</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
 <div id="timeSeries"><!-- Plotly chart will be drawn inside this DIV --></div>
 <!-- Plotly.js -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -152,28 +186,38 @@
     return new Date(d);
   }
 
-  function panasToScore(score_arr) {
+  function reduceScoreArr(score_arr) {
     const reducer = (accumulator, currentValue) => accumulator + currentValue
     return score_arr.reduce(reducer)
   }
 
-  // CREATE CLINICAL QUESTIONS DROPDOWN PROGRAMMATICALLY ======================
-  const clinicalQuestionsDiv = document.getElementById('clinical-questions');
-  const aElement = document.createElement('a');
-  aElement.className = "dropdown-item";
-  aElement.innerHTML = "Q1";
-
-  const faCheck = document.createElement("i");
-  faCheck.className ="fa fa-check";
-
-  aElement.appendChild(faCheck);
-
-  function mapClinicalQuestions() {
-
-
+  function enableNumDaysButton() {
+    numDaysButtonDiv.classList.remove("disabled");
   }
 
-  //<a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">HAM-D-17<i class="fa fa-check" aria-hidden="true"></i></a>
+  function disableNumDaysButton() {
+    numDaysButtonDiv.classList.add("disabled");
+  }
+
+  // Function to reset menu selections to default
+  function resetMenuSelections() {
+    const menuIds = ['panas', 'clinical', 'aggregation', 'days'];
+
+    for (let menuId of menuIds) {
+      let dropdownItems = document.getElementById(menuId).childNodes;
+      console.log(dropdownItems);
+
+      for (let i = 0; i < dropdownItems.length; i++) {
+        if (dropdownItems[i].nodeType != Node.TEXT_NODE) {
+          if (i == 1) {
+            dropdownItems[i].setAttribute("class", "dropdown-item active");
+          } else {
+            dropdownItems[i].setAttribute("class", "dropdown-item");
+          }
+        }
+      }
+    }
+  }
 
   // Function to reset everything to default
   function resetToDefaults() {
@@ -185,7 +229,28 @@
     clinicalButtonDiv.innerHTML = "Clinical Dataset [" + clinicalDataset + "]";
     aggregationButtonDiv.innerHTML = 'Aggregation [None]';
     numDaysButtonDiv.innerHTML = '# of Days [N/A]';
+
+    disableNumDaysButton();
+    resetMenuSelections();
   }
+
+  // CREATE CLINICAL QUESTIONS DROPDOWN PROGRAMMATICALLY ======================
+  // const clinicalQuestionsDiv = document.getElementById('clinical-questions');
+  // const aElement = document.createElement('a');
+  // aElement.className = "dropdown-item";
+  // aElement.innerHTML = "Q1";
+  //
+  // const faCheck = document.createElement("i");
+  // faCheck.className ="fa fa-check";
+  //
+  // aElement.appendChild(faCheck);
+  //
+  // function mapClinicalQuestions() {
+  //
+  //
+  // }
+
+  //<a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">HAM-D-17<i class="fa fa-check" aria-hidden="true"></i></a>
 
   // MAIN AGGREGATION FUNCTION FOR PANAS DATA =================================
   function aggregatePANAS() {
@@ -280,7 +345,6 @@
     patientNumber = patientNum;
 
     patientButtonDiv.innerHTML = "Patient [" + patientNum + "]";
-    numDaysButtonDiv.classList.remove("disabled");
     panasButtonDiv.classList.remove("disabled");
     clinicalButtonDiv.classList.remove("disabled");
     aggregationButtonDiv.classList.remove("disabled");
@@ -288,7 +352,7 @@
 
     let newPANASObj = {
       x: panas_data[PANAS_names[patientNum - 1]]['date'].map(panasToDate),
-      y: panas_data[PANAS_names[patientNum - 1]]['positive_scores'].map(panasToScore),
+      y: panas_data[PANAS_names[patientNum - 1]]['positive_scores'].map(reduceScoreArr),
       mode: 'lines+markers',
       type: 'scatter',
       name: PANAS_names[patientNum - 1],
@@ -301,7 +365,7 @@
 
     let newClinicalObj = {
       x: clinical_data['P' + patientNum][clinicalDataset]['date'].map(clinicalToDate),
-      y: clinical_data['P' + patientNum][clinicalDataset]['score'],
+      y: clinical_data['P' + patientNum][clinicalDataset]['scores'].map(reduceScoreArr),
       mode: 'lines+markers',
       type: 'scatter',
       name: clinicalDataset,
@@ -334,18 +398,18 @@
     };
 
     if (panasDataset == 'pos') {
-      thisPANASTrace.y = panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(panasToScore);
+      thisPANASTrace.y = panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(reduceScoreArr);
       panasButtonDiv.innerHTML = "PANAS Dataset [PA]";
     }
     if (panasDataset == 'neg') {
-      thisPANASTrace.y = panas_data[PANAS_names[patientNumber - 1]]['negative_scores'].map(panasToScore);
+      thisPANASTrace.y = panas_data[PANAS_names[patientNumber - 1]]['negative_scores'].map(reduceScoreArr);
       panasButtonDiv.innerHTML = "PANAS Dataset [NA]";
     }
     if (panasDataset == 'div' || panasDataset == 'log') {
       thisPANASTrace.y = [];
-      for (i = 0; i < panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(panasToScore).length; i++) {
-        let pos = panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(panasToScore)[i];
-        let neg = panas_data[PANAS_names[patientNumber - 1]]['negative_scores'].map(panasToScore)[i];
+      for (i = 0; i < panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(reduceScoreArr).length; i++) {
+        let pos = panas_data[PANAS_names[patientNumber - 1]]['positive_scores'].map(reduceScoreArr)[i];
+        let neg = panas_data[PANAS_names[patientNumber - 1]]['negative_scores'].map(reduceScoreArr)[i];
         if (panasDataset == 'div') {
           thisPANASTrace.y.push(pos/neg);
           panasButtonDiv.innerHTML = "PANAS Dataset [PA/NA]";
@@ -380,7 +444,7 @@
 
     let newClinicalObj = {
       x: clinical_data['P1'][scale]['date'].map(clinicalToDate),
-      y: clinical_data['P1'][scale]['score'],
+      y: clinical_data['P1'][scale]['scores'].map(reduceScoreArr),
       mode: 'lines+markers',
       type: 'scatter',
       name: scale,
@@ -408,14 +472,6 @@
 
     numDays = days;
     aggregatePANAS();
-  }
-
-  function enableNumDaysButton() {
-    numDaysButtonDiv.classList.remove("disabled");
-  }
-
-  function disableNumDaysButton() {
-    numDaysButtonDiv.classList.add("disabled");
   }
 
   // default = none
