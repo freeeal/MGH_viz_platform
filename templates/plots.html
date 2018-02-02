@@ -37,6 +37,9 @@
       <a class="dropdown-item" onclick="selectClinical(this, 'PSS')">PSS</a>
       <a class="dropdown-item" onclick="selectClinical(this, 'ERS')">ERS</a>
       <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">RRS</a>
+      <a class="dropdown-item" data-toggle="modal" data-target="#selectedClinicalQuestionsModal">
+        View Selected Clinical Questions
+      </a>
     </div>
   </div>
   <div class="dropdown">
@@ -72,24 +75,6 @@
       <a class="dropdown-item" href="#" onclick="updateNumDays(this, 14)">14</a>
     </div>
   </div>
-  <!-- <div class="dropdown">
-    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Selected Clinical Questions
-    </button>
-    <div id="selected-clinical-questions" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">Depressed mood<i class="fa fa-check" aria-hidden="true"></i></a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-D-28')">Feelings of guilt</a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'HAM-A')">Suicide <i class="fa fa-check" aria-hidden="true"></i></a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'PSS')">Insomnia early<i class="fa fa-check" aria-hidden="true"></i></a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'ERS')">Insomnia middle</a>
-      <a class="dropdown-item" onclick="selectClinical(this, 'RRS')">Insomnia late</a>
-    </div>
-  </div> -->
-
-  <!-- Button trigger modal -->
-  <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#selectedClinicalQuestionsModal">
-    Launch demo modal
-  </button>
 
   <!-- Modal -->
   <div class="modal fade" id="selectedClinicalQuestionsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -101,19 +86,12 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <div>
-            <input type="checkbox" id="coding" name="interest" value="coding" checked>
-            <label for="coding">Coding</label>
-          </div>
-          <div>
-            <input type="checkbox" id="music" name="interest" value="music">
-            <label for="music">Music</label>
-          </div>
+        <div class="modal-body" id="clinical-questions">
+          <!-- clinical question inputs created here -->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary" onclick="replotClinicalData()" data-dismiss="modal">Save changes</button>
         </div>
       </div>
     </div>
@@ -232,25 +210,83 @@
 
     disableNumDaysButton();
     resetMenuSelections();
+    createQuestionsDiv();
   }
 
-  // CREATE CLINICAL QUESTIONS DROPDOWN PROGRAMMATICALLY ======================
-  // const clinicalQuestionsDiv = document.getElementById('clinical-questions');
-  // const aElement = document.createElement('a');
-  // aElement.className = "dropdown-item";
-  // aElement.innerHTML = "Q1";
-  //
-  // const faCheck = document.createElement("i");
-  // faCheck.className ="fa fa-check";
-  //
-  // aElement.appendChild(faCheck);
-  //
-  // function mapClinicalQuestions() {
-  //
-  //
-  // }
+  // CREATE CLINICAL QUESTIONS CHECKBOXES PROGRAMMATICALLY =====================
+  const clinicalQuestionsDiv = document.getElementById('clinical-questions');
 
-  //<a class="dropdown-item" onclick="selectClinicalQuestion(this, 'HAM-D-17')">HAM-D-17<i class="fa fa-check" aria-hidden="true"></i></a>
+  function createQuestionsDiv() {
+    // clear question div and re-create
+    while (clinicalQuestionsDiv.hasChildNodes()) {
+        clinicalQuestionsDiv.removeChild(clinicalQuestionsDiv.childNodes[0]);
+    }
+    clinicalScoreArr = clinical_data['P' + patientNumber][clinicalDataset]['scores'][0];
+
+    for (let i = 0; i < clinicalScoreArr.length; i++) {
+      let newQuestionDiv = document.createElement('div');
+      const inputEle = document.createElement("input");
+      inputEle.setAttribute('type', 'checkbox');
+      inputEle.checked = true;
+      // inputEle.addEventListener('click', replotClinicalData);
+      const labelEle = document.createElement("label");
+      labelEle.innerHTML = i+1;
+      newQuestionDiv.appendChild(inputEle)
+      newQuestionDiv.appendChild(labelEle);
+      clinicalQuestionsDiv.appendChild(newQuestionDiv);
+    }
+    // <div>
+    //   <input type="checkbox" id="coding" name="interest" value="coding" checked>
+    //   <label for="coding">Coding</label>
+    // </div>
+  }
+
+  function replotClinicalData() {
+    // listen for checkmark activity
+    console.log('replot fn called');
+    let checkedArr = [];
+
+    let inputs = document.querySelectorAll("input[type='checkbox']");
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].checked === true ? checkedArr.push(true) : checkedArr.push(false);
+    }
+
+    console.log(checkedArr);
+
+    let newClinicalObj = {
+      x: clinical_data['P' + patientNumber][clinicalDataset]['date'].map(clinicalToDate),
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: clinicalDataset,
+      yaxis: 'y2',
+      line: {
+        dash: 'solid',
+        color: '#dc3545',
+        width: 1
+      }
+    }
+
+    // make copy of original clinical dataset
+    let newClinicalScoreArr = clinical_data['P' + patientNumber][clinicalDataset]['scores'].map(function(arr) {
+        return arr.slice();
+    });
+
+    // loop through and only add these to the display array, for each array in clinical_data['P' + patientNumber][clinicalDataset]['scores']
+    for (let i = 0; i < checkedArr.length; i++) {
+      if (checkedArr[i] === false) {
+        for (let j = 0; j < newClinicalScoreArr.length; j++) {
+          newClinicalScoreArr[j][i] = 0;
+        }
+      }
+    }
+
+    console.log(newClinicalScoreArr);
+
+    newClinicalObj.y = newClinicalScoreArr.map(reduceScoreArr);
+    data[1] = newClinicalObj;
+
+    Plotly.newPlot('timeSeries', data, layout);
+}
 
   // MAIN AGGREGATION FUNCTION FOR PANAS DATA =================================
   function aggregatePANAS() {
@@ -462,6 +498,7 @@
     if (aggregationType != 'none') {
       aggregatePANAS();
     }
+    createQuestionsDiv();
   }
 
   // default = 1
