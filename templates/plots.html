@@ -95,6 +95,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -235,10 +236,6 @@
       newQuestionDiv.appendChild(labelEle);
       clinicalQuestionsDiv.appendChild(newQuestionDiv);
     }
-    // <div>
-    //   <input type="checkbox" id="coding" name="interest" value="coding" checked>
-    //   <label for="coding">Coding</label>
-    // </div>
   }
 
   function replotClinicalData() {
@@ -286,7 +283,7 @@
     data[1] = newClinicalObj;
 
     Plotly.newPlot('timeSeries', data, layout);
-}
+  }
 
   // MAIN AGGREGATION FUNCTION FOR PANAS DATA =================================
   function aggregatePANAS() {
