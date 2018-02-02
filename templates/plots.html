@@ -226,12 +226,14 @@
 
     for (let i = 0; i < clinicalScoreArr.length; i++) {
       let newQuestionDiv = document.createElement('div');
+      newQuestionDiv.className = "new-question";
       const inputEle = document.createElement("input");
       inputEle.setAttribute('type', 'checkbox');
       inputEle.checked = true;
-      // inputEle.addEventListener('click', replotClinicalData);
+      inputEle.className = "new-question-input";
       const labelEle = document.createElement("label");
       labelEle.innerHTML = i+1;
+      labelEle.className = "new-question-label";
       newQuestionDiv.appendChild(inputEle)
       newQuestionDiv.appendChild(labelEle);
       clinicalQuestionsDiv.appendChild(newQuestionDiv);
