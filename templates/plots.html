@@ -100,6 +100,7 @@
 </div>
 
 <div id="timeSeries"><!-- Plotly chart will be drawn inside this DIV --></div>
+<div id="scatterPlot"><!-- Plotly chart will be drawn inside this DIV --></div>
 <!-- Plotly.js -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
@@ -284,7 +285,7 @@
     newClinicalObj.y = newClinicalScoreArr.map(reduceScoreArr);
     data[1] = newClinicalObj;
 
-    Plotly.newPlot('timeSeries', data, layout);
+    Plotly.newPlot('timeSeries', data, timeSeriesLayout);
   }
 
   // MAIN AGGREGATION FUNCTION FOR PANAS DATA =================================
@@ -369,9 +370,28 @@
         width: 1
       }
     };
-    displayData = [panasDisplayObj, clinicalDisplayObj];
 
-    Plotly.newPlot('timeSeries', displayData, layout);
+    let displayData = [panasDisplayObj, clinicalDisplayObj];
+    Plotly.newPlot('timeSeries', displayData, timeSeriesLayout);
+
+    // make scatter plot
+    console.log(clinicalDisplayArr['score']);
+    console.log(panasDisplayArr['score']);
+    let scatterDisplayObj = {
+      x: clinicalDisplayArr['score'],
+      y: panasDisplayArr['score'],
+      mode: 'lines+markers',
+      type: 'scatter',
+      name: PANAS_names[patientNumber - 1],
+      line: {
+        dash: 'solid',
+        color: '#000000',
+        width: 1
+      }
+    };
+
+    let scatterPlotData = [scatterDisplayObj];
+    Plotly.newPlot('scatterPlot', scatterPlotData, scatterPlotLayout);
   }
 
   // MENU SELECTION FUNCTIONS =================================================
@@ -413,7 +433,7 @@
     }
 
     data = [newPANASObj, newClinicalObj];
-    Plotly.newPlot('timeSeries', data, layout);
+    Plotly.newPlot('timeSeries', data, timeSeriesLayout);
   }
 
   function selectPANAS(thisEl, affectType) {
@@ -457,7 +477,7 @@
 
     data[0] = thisPANASTrace;
     console.log(data);
-    Plotly.newPlot('timeSeries', data, layout);
+    Plotly.newPlot('timeSeries', data, timeSeriesLayout);
     if (aggregationType != 'none') {
       aggregatePANAS();
     }
@@ -493,7 +513,7 @@
 
     data[1] = newClinicalObj;
     console.log(data);
-    Plotly.newPlot('timeSeries', data, layout);
+    Plotly.newPlot('timeSeries', data, timeSeriesLayout);
     if (aggregationType != 'none') {
       aggregatePANAS();
     }
@@ -527,7 +547,7 @@
       disableNumDaysButton();
       numDays = 0; // reset numDays to 0 when aggregation is reset to 'none'
       numDaysButtonDiv.innerHTML = "# of Days [N/A]";
-      Plotly.newPlot('timeSeries', data, layout);
+      Plotly.newPlot('timeSeries', data, timeSeriesLayout);
     }
   }
 
@@ -550,7 +570,7 @@
   // empty initial selected datasets
   let data = [{}, { yaxis: 'y2' }];
 
-  let layout = {
+  let timeSeriesLayout = {
     title:'Time Series of PANAS & Clinical Scale',
     xaxis: {
       title: 'Date',
@@ -591,7 +611,39 @@
     // plot_bgcolor: '#F1F2F0'
   };
 
-  Plotly.newPlot('timeSeries', data, layout);
+  Plotly.newPlot('timeSeries', data, timeSeriesLayout);
+
+  let scatterPlotLayout = {
+    title:'PANAS vs. Clinical Scale',
+    xaxis: {
+      title: 'Clinical Score',
+      titlefont: {color: '#dc3545', size: 16},
+      tickfont: {color: '#dc3545', size: 14},
+    },
+    yaxis: {
+      title: 'PANAS Score',
+      titlefont: {color: '#007bff', size: 16},
+      tickfont: {color: '#007bff', size: 14},
+    },
+    width: 1200,
+    height: 600,
+    legend: {
+      x: 0.9,
+      y: -0.25,
+      traceorder: 'normal',
+      font: {
+        size: 14
+      },
+    },
+    font: {
+      family: "'Roboto', sans-serif",
+      size: 16
+    },
+  };
+
+  Plotly.newPlot('scatterPlot', data, scatterPlotLayout);
+
+
 </script>
 
 {% endblock %}
