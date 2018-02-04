@@ -24,3 +24,7 @@ body {
 .new-question-label {
   padding-left: 5px;
 }
+
+#scatterPlot {
+  display: none;
+}

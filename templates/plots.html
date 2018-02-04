@@ -3,8 +3,13 @@
 {% block content %}
 
 <div class="row">
+  <div class="dropdown" id="plotToggleButtonDiv">
+    <button class="btn btn-dark btn-md" type="button" id="plotToggleButton" onclick="togglePlot()" aria-haspopup="true" aria-expanded="false">
+      View Scatter Plot
+    </button>
+  </div>
   <div class="dropdown">
-    <button class="btn btn-dark btn-lg dropdown-toggle" type="button" id="patientDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-success btn-md dropdown-toggle" type="button" id="patientDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Patient #
     </button>
     <div id="patient" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -16,7 +21,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-primary btn-lg dropdown-toggle disabled" type="button" id="panasDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-primary btn-md dropdown-toggle disabled" type="button" id="panasDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       PANAS Dataset
     </button>
     <div id="panas" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -27,7 +32,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-danger btn-lg dropdown-toggle disabled" type="button" id="clinicalDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-danger btn-md dropdown-toggle disabled" type="button" id="clinicalDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Clinical Dataset
     </button>
     <div id="clinical" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -43,7 +48,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-dark btn-lg dropdown-toggle disabled" type="button" id="aggregationDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-dark btn-md dropdown-toggle disabled" type="button" id="aggregationDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Aggregation
     </button>
     <div id="aggregation" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -55,7 +60,7 @@
     </div>
   </div>
   <div class="dropdown">
-    <button class="btn btn-dark btn-lg dropdown-toggle disabled" type="button" id="numDaysDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-dark btn-md dropdown-toggle disabled" type="button" id="numDaysDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       # of Days
     </button>
     <div id="days" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -583,7 +588,7 @@
       tickfont: {color: '#007bff', size: 14},
     },
     yaxis2: {
-      title: 'Clinical Scale Score',
+      title: 'Clinical Score',
       titlefont: {color: '#dc3545', size: 16},
       tickfont: {color: '#dc3545', size: 14},
       overlaying: 'y',
@@ -613,8 +618,26 @@
 
   Plotly.newPlot('timeSeries', data, timeSeriesLayout);
 
+  // Function to toggle between time series and scatter plots
+  // also, changes button html
+  function togglePlot() {
+      let timeSeriesPlotEl = document.getElementById("timeSeries");
+      let scatterPlotEl = document.getElementById("scatterPlot");
+      let plotToggleButtonEl = document.getElementById("plotToggleButton");
+
+      if (scatterPlotEl.style.display === "none") {
+          scatterPlotEl.style.display = "block";
+          timeSeriesPlotEl.style.display = "none";
+          plotToggleButtonEl.innerHTML = "View Time Series";
+      } else {
+          scatterPlotEl.style.display = "none";
+          timeSeriesPlotEl.style.display = "block";
+          plotToggleButtonEl.innerHTML = "View Scatter Plot";
+      }
+  }
+
   let scatterPlotLayout = {
-    title:'PANAS vs. Clinical Scale',
+    title:'PANAS vs. Clinical Score',
     xaxis: {
       title: 'Clinical Score',
       titlefont: {color: '#dc3545', size: 16},
@@ -641,8 +664,7 @@
     },
   };
 
-  Plotly.newPlot('scatterPlot', data, scatterPlotLayout);
-
+  Plotly.newPlot('scatterPlot', [], scatterPlotLayout);
 
 </script>
 
