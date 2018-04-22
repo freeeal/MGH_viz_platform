@@ -17,6 +17,11 @@ cd ..
 yarn install
 ```
 
+## Configuring the Database
+```
+bash setup.sh
+```
+
 ## Running the App
 
 ```
