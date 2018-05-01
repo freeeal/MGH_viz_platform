@@ -4,7 +4,8 @@
   "scripts": {
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
-    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
+    "start": "node server.js"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -20,5 +21,18 @@
   },
   "devDependencies": {
     "concurrently": "^3.5.0"
-  }
+  },
+  "description": "## Installing Dependencies - download [Node](https://nodejs.org/en/download/) - install [Yarn](https://yarnpkg.com/en/docs/install)",
+  "main": "json-parsers.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/freeeal/MGH_viz_platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/freeeal/MGH_viz_platform/issues"
+  },
+  "homepage": "https://github.com/freeeal/MGH_viz_platform#readme"
 }
