@@ -1,12 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const tempDirectory = 'data/E4/TEMP/';
+const accDirectory = 'data/E4/ACC/';
 
 exports.up = function(knex, Promise) {
   let migrationPromises = new Array();
   return new Promise(function(resolve, reject) {
-    fs.readdir(tempDirectory, function(err, files) {
+    fs.readdir(accDirectory, function(err, files) {
       if (err) {
         console.error('Could not list the directory.', err);
         reject();
@@ -17,30 +17,27 @@ exports.up = function(knex, Promise) {
         let file = files[index];
         let i = file.indexOf('.');
         let name = file.substring(0, i);
-        console.log(name);
-        console.log(index);
         migrationPromises.push(
           knex.schema.createTable(name, (table) => {
-            table.increments();
-            table.string('date');
-            table.float('temperature');
+            table.string('date').primary();
+            table.float('acc_vector');
           })
-        );
+        )
       }
       resolve();
-    });
+    })
   })
   .then(() => {
     return Promise.all(migrationPromises);
-  });
+  })
 };
 
 exports.down = function(knex, Promise) {
   let migrationPromises = new Array();
   return new Promise(function(resolve, reject) {
-    fs.readdir(tempDirectory, function(err, files) {
+    fs.readdir(accDirectory, function(err, files) {
       if (err) {
-        console.error('Could not list the dirrectory.', err);
+        console.error('Could not list the directory.', err);
         reject();
         process.exit(1);
       }
